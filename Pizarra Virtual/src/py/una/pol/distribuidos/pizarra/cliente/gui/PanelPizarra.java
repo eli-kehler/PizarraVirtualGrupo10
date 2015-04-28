@@ -14,8 +14,9 @@ public class PanelPizarra extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public PanelPizarra() {
-
+	public PanelPizarra(int w, int h) {
+		
+		this.setSize(w, h);
 		pizarra = new Rectangle(0,0,this.getWidth(), this.getHeight());
 		
 	}
