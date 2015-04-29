@@ -1,0 +1,16 @@
+package py.una.pol.distribuidos.pizarra.servidor;
+
+import java.awt.Dimension;
+import java.awt.Point;
+import java.net.InetAddress;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface PizarraInterfaz extends Remote {
+	
+	public boolean Registrar(String nombre, InetAddress direccion) throws RemoteException;
+	public Dimension obtenerDimensiones() throws RemoteException;
+	public boolean[][] obtenerMatriz() throws RemoteException;
+	public boolean actualizar(Point[] puntos);
+	
+}
