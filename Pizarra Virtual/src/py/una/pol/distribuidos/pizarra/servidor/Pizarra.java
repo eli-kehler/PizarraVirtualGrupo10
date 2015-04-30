@@ -1,12 +1,14 @@
 package py.una.pol.distribuidos.pizarra.servidor;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.net.InetAddress;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -17,8 +19,8 @@ public class Pizarra implements PizarraInterfaz
 	public static final int WIDTH = 1024;
 	public static final int HEIGHT = 700;
 	
-	// Lista de Objetos a Clientes remotos (en caso de utilizarlos para notificarlos de eventos)
-	private ArrayList<Object> clientes = null;
+	// Objeto que se encarga de realizar las notificaciones
+	private Notificador notificador = null;
 	
 	// Variables privadas
 	private boolean[][] pizarra = null;
@@ -38,6 +40,9 @@ public class Pizarra implements PizarraInterfaz
 		height = HEIGHT;
 		pizarra = new boolean[height][width];
 		semaforo = new ReentrantLock();
+		notificador = new Notificador();
+		
+		new Thread(notificador).start();
 	}
 	
 	/* Permite a un cliente registrarse, dandole informacion
@@ -54,7 +59,7 @@ public class Pizarra implements PizarraInterfaz
 		try
 		{
 			Object cliente = registry.lookup(nombre);
-			clientes.add(cliente);
+			notificador.clientes.add(cliente);
 		} catch (NotBoundException e)
 		{
 			e.printStackTrace();
@@ -63,6 +68,8 @@ public class Pizarra implements PizarraInterfaz
 
 		return true;
 	}
+	
+	
 
 	/* Permite a un cliente obtener las dimensiones actuales
 	 * de la Pizarra */
@@ -76,9 +83,7 @@ public class Pizarra implements PizarraInterfaz
 	@Override
 	public boolean[][] obtenerMatriz() throws RemoteException
 	{
-		boolean r[][] = pizarra;
-	
-		return r;
+		return pizarra;
 	}
 
 	/* Permite a un Cliente enviar una serie de puntos que fueron modificados
@@ -100,6 +105,7 @@ public class Pizarra implements PizarraInterfaz
 				for (Punto punto : puntos)
 				{
 					pizarra_temp[punto.posicion.y][punto.posicion.x] = punto.estado;
+					notificador.puntos.put(punto.posicion, punto.estado);
 				}
 				
 				pizarra = pizarra_temp;
@@ -118,6 +124,36 @@ public class Pizarra implements PizarraInterfaz
 		return false;
 	}
 	
-	
+	private class Notificador implements Runnable {
+		
+		// Lista de Objetos a Clientes remotos (en caso de utilizarlos para notificarlos de eventos)
+		public ArrayList<Object> clientes = null;
+		public TreeMap<Point, Boolean> puntos = null;
+		
+		public Notificador()
+		{
+			super();
+			
+			clientes = new ArrayList<>();
+			puntos = new TreeMap<>();
+		}
+		
+		@Override
+		public void run()
+		{
+			
+			// proceso de actualizacion
+			
+			puntos.clear();
+			try
+			{
+				Thread.sleep(10);  // Actualiza cada 10 milisegundos
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+	}
 	
 }
