@@ -11,10 +11,14 @@ import java.awt.Point;
 public class ClienteRMI {
 	private Registry bind;
 	private Dimension dimensiones;
-	private boolean[][] matrtiz;
+	private boolean[][] matriz;
 	PizarraInterfaz impl;
 	
-	public Dimension obtenerDimensiones() throws RemoteException{
+	public ClienteRMI(String nombre){
+		registrarCliente(nombre);
+	}
+	
+	public void obtenerDimensiones() throws RemoteException{
 		
 		dimensiones = impl.obtenerDimensiones();
 		return dimensiones;
@@ -31,7 +35,7 @@ public class ClienteRMI {
 		return matriz;
 	}
 	
-	public void sendToServer(Point[] puntos) throws RemoteException{
+	public void sendToServer(Punto[] puntos) throws RemoteException{
 
 			impl.actualizar(puntos);
 	}
