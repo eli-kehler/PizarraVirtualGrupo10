@@ -13,9 +13,15 @@ public class ClienteRMI {
 	private Dimension dimensiones;
 	private boolean[][] matriz;
 	PizarraInterfaz impl;
+	String nombre;
 	
 	public ClienteRMI(String nombre){
+		this.nombre = nombre;
 		registrarCliente(nombre);
+	}
+	
+	public String getNombre(){
+		return nombre;
 	}
 	
 	public void obtenerDimensiones() throws RemoteException{
@@ -29,7 +35,7 @@ public class ClienteRMI {
 		impl = (PizarraInterfaz) bind.lookup(nombre);
 	}
 	
-	public boolean[][] getActualizaciones() throws RemoteException{
+	public boolean[][] getMatriz() throws RemoteException{
 
 		matriz = impl.obtenerMatriz();
 		return matriz;
