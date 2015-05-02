@@ -121,14 +121,20 @@ public class VentanaPrincipal extends JFrame {
 		panelPizarra.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				int x = e.getX();
+				int y = e.getY();
 				
-				if (btnLapiz.isSelected()){
-					if (puntosActualizar == null)	
-						puntosActualizar = new ArrayList<Punto>();
-					panelPizarra.pintar(new Rectangle(e.getX(), e.getY(), 1, 1));
-					puntosActualizar.add(new Punto(e.getPoint(), true));
-					
-					
+				if (x >= 0 && x < panel.getWidth() && y >= 0 && y < panel.getHeight()){
+					if (btnLapiz.isSelected()){
+						if (!chckbxBorrar.isSelected()){
+							panelPizarra.pintar(new Rectangle(x, y, 1, 1));
+							puntosActualizar.add(new Punto(e.getPoint(), true));
+						} else {
+							panelPizarra.borrar(new Rectangle(x,y, 1, 1));
+							puntosActualizar.add(new Punto(e.getPoint(), false));
+						}
+						
+					}
 				}
 			}
 

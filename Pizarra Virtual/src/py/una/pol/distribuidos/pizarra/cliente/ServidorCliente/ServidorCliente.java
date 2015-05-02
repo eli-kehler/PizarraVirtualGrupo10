@@ -5,18 +5,21 @@ import java.net.ServerSocket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
 import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
 
 
 public class ServidorCliente {
-	private ClienteRMI cliente;
+	private Pizarra pizarra;
 	private int puerto;
 	
 	public ServidorCliente(){
-		iniciarServidor(cliente.getNombre());
+		iniciarServidor(pizarra.getPintor());
 	}
 	
 	public void iniciarServidor(String nombre){
+		
+		
 		
 		try{
 			Registry registry = LocateRegistry.createRegistry(puerto);

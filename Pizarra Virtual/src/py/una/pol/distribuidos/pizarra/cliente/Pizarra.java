@@ -17,6 +17,12 @@ public class Pizarra {
 		this.matriz = matriz;
 		this.pintor = pintor;
 	}
+	
+	public Pizarra(String pintor){
+		this.pintor = pintor;
+	}
+	
+	
 
 	public boolean[][] getMatriz() {
 		return matriz;

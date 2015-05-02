@@ -1,51 +1,49 @@
 package py.una.pol.distribuidos.pizarra.cliente.rmi;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
 
 
 public class ClienteRMI {
-	private Registry bind;
-	private Dimension dimensiones;
-	private boolean[][] matriz;
-	PizarraInterfaz impl;
-	String nombre;
+	private PizarraInterfaz impl;
 	
-	public ClienteRMI(String nombre) throws RemoteException, NotBoundException{
-		this.nombre = nombre;
-		registrarCliente(nombre);
-	}
-	
-	public String getNombre(){
-		return nombre;
+	public ClienteRMI(String host, int port) throws AccessException, RemoteException, NotBoundException{
+		
+		Registry bind = LocateRegistry.getRegistry(host, port);
+		//TODO nombre del objeto remoto
+		impl = (PizarraInterfaz) bind.lookup("miPizarra");
+		
 	}
 	
 	public Dimension obtenerDimensiones() throws RemoteException{
 		
-		dimensiones = impl.obtenerDimensiones();
-		return dimensiones;
+		return impl.obtenerDimensiones();
+		
 	}
 	
-	public void registrarCliente(String nombre) throws RemoteException, NotBoundException{
-		Registry bind = LocateRegistry.getRegistry("127.0.0.1",1099);
-		impl = (PizarraInterfaz) bind.lookup(nombre);
+	public boolean registrarCliente(String nombre, InetAddress address, int port) throws RemoteException, NotBoundException{
+
+		return impl.Registrar(nombre, address, port);
+		
 	}
 	
 	public boolean[][] getMatriz() throws RemoteException{
 
-		matriz = impl.obtenerMatriz();
-		return matriz;
+		return impl.obtenerMatriz();
 	}
 	
-	public void sendToServer(Punto[] puntos) throws RemoteException{
+	public boolean sendToServer(Punto[] puntos) throws RemoteException{
 
-			impl.actualizar(puntos);
+			return impl.actualizar(puntos);
 	}
 }

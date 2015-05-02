@@ -80,6 +80,12 @@ public class PanelPizarra extends JPanel {
 		
 	}
 	
+	public void borrar( Shape forma){
+		Graphics2D g2d = (Graphics2D) this.getGraphics();
+		g2d.setPaint(Color.WHITE);
+		g2d.fill(forma);
+		
+	}
 	
 	/*
 	public void agregarPuntos(ArrayList<Point> puntosAgregados){
