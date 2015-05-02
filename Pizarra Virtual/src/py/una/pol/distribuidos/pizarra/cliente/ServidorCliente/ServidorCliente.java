@@ -14,9 +14,11 @@ public class ServidorCliente {
 	}
 	
 	public void iniciarServidor(String nombre){
+		
 		try{
 			Registry registry = LocateRegistry.createRegistry(puerto);
 			registry.rebind(nombre, new InterfazServidorClienteImpl());
+		
 		}catch(Exception e){
 			e.printStackTrace();
 		}
