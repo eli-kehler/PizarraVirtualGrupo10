@@ -17,5 +17,9 @@ public interface PizarraInterfaz extends Remote {
 	{
 		public Point posicion;
 		public boolean estado;
+		public Punto(Point posicion, boolean estado) {
+			this.posicion = posicion;
+			this.estado = estado;
+		}
 	}
 }
