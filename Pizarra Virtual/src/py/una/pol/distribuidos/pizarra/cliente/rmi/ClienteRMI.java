@@ -6,6 +6,9 @@ import java.rmi.registry.Registry;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz;
+import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
+
 
 
 public class ClienteRMI {
@@ -15,7 +18,7 @@ public class ClienteRMI {
 	PizarraInterfaz impl;
 	String nombre;
 	
-	public ClienteRMI(String nombre){
+	public ClienteRMI(String nombre) throws RemoteException, NotBoundException{
 		this.nombre = nombre;
 		registrarCliente(nombre);
 	}
@@ -24,13 +27,13 @@ public class ClienteRMI {
 		return nombre;
 	}
 	
-	public void obtenerDimensiones() throws RemoteException{
+	public Dimension obtenerDimensiones() throws RemoteException{
 		
 		dimensiones = impl.obtenerDimensiones();
 		return dimensiones;
 	}
 	
-	public void registrarCliente(String nombre) throws RemoteException{
+	public void registrarCliente(String nombre) throws RemoteException, NotBoundException{
 		Registry bind = LocateRegistry.getRegistry("127.0.0.1",1099);
 		impl = (PizarraInterfaz) bind.lookup(nombre);
 	}
