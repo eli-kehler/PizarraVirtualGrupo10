@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 
+import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
 import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
@@ -20,21 +21,20 @@ import com.sun.javafx.geom.Ellipse2D;
 
 public class PanelPizarra extends JPanel {
 
-	private Rectangle pizarra;
+	private Pizarra pizarra;
 	private ClienteRMI cliente;
 	private ArrayList<Point> actualizar = null;
 	private Shape temporal;
 	private boolean borrar;
-	private boolean[][] puntos;
+
 	
 	/**
 	 * Create the panel.
 	 */
-	public PanelPizarra(int w, int h) {
+	public PanelPizarra(Pizarra p) {
+		pizarra = p;
+		this.setSize(pizarra.getDimension());
 		
-		this.setSize(w, h);
-		pizarra = new Rectangle(0,0,w, h);
-		puntos = new boolean[w][h];
 		
 	}
 	/**
@@ -47,11 +47,12 @@ public class PanelPizarra extends JPanel {
 
 		// Dibuja la pizarra al comienzo
 		g2d.setPaint(Color.WHITE);
-		g2d.fill(pizarra);
+		g2d.fill(new Rectangle(pizarra.getDimension()));
 
 		
 		// Inicializar los puntos negros
 		g2d.setPaint(Color.BLACK);
+		boolean[][] puntos = pizarra.getMatriz();
 		for (int x=0; x<puntos.length; x++)
 			for(int y=0; y<puntos[x].length; y++)
 				if (puntos[x][y])
@@ -97,14 +98,7 @@ public class PanelPizarra extends JPanel {
 	}
 	*/
 
-	public void actualizarPuntos(ArrayList<Punto> puntosActualizar){
-		
-		for (Punto p : puntosActualizar)
-			puntos[p.posicion.x][p.posicion.y] = p.estado;
-			
-		//TODO: Actualizar servidor
-		
-	}
+
 	
 	
 	/**
@@ -118,4 +112,9 @@ public class PanelPizarra extends JPanel {
 		
 	}
 	
+		
+	public Pizarra getPizarra() {
+		return pizarra;
+	}
+
 }

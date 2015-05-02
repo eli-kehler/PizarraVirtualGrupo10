@@ -1,4 +1,4 @@
-package py.una.pol.distribuidos.pizarra.cliente.rmi
+package py.una.pol.distribuidos.pizarra.cliente.rmi;
 
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;

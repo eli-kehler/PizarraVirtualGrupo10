@@ -13,6 +13,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
 import py.una.pol.distribuidos.pizarra.cliente.gui.PanelPizarra;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
@@ -47,6 +48,7 @@ public class VentanaPrincipal extends JFrame {
 	private JToggleButton btnRect;
 	private final ButtonGroup botonesHerramientas = new ButtonGroup();
 	private ArrayList<Punto> puntosActualizar = null;
+	private JLabel lblDebug;
 
 
 
@@ -77,26 +79,38 @@ public class VentanaPrincipal extends JFrame {
 		botonesHerramientas.add(btnRect);
 		panelLateral.add(btnRect);
 		
+		lblDebug = new JLabel("debug");
+		panelLateral.add(lblDebug);
+		
 		panel = new JPanel();
 		contentPane.add(panel, BorderLayout.CENTER);
 		
+		//TODO obtener dimensiones
 		int pizarraWidth, pizarraHeight;
-		pizarraWidth = 250;
-		pizarraHeight = 200;
-		panelPizarra = new PanelPizarra(pizarraWidth, pizarraHeight);
+		pizarraWidth = 640;
+		pizarraHeight = 480;
+		panelPizarra = new PanelPizarra(new Pizarra(new boolean[pizarraWidth][pizarraHeight], "Pintor"));
+
 		panelPizarra.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (btnLapiz.isSelected()){
-					panelPizarra.actualizarPuntos(puntosActualizar);
+					panelPizarra.getPizarra().actualizarMatriz(puntosActualizar);
 					puntosActualizar = null;
+					
 				}
 				
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (puntosActualizar == null)
+					puntosActualizar = new ArrayList<>();
 			}
 		});
 		panelPizarra.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				
 				if (btnLapiz.isSelected()){
 					if (puntosActualizar == null)	
 						puntosActualizar = new ArrayList<Punto>();
