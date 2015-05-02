@@ -36,6 +36,7 @@ import java.util.Hashtable;
 
 import javax.swing.JToggleButton;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -48,7 +49,7 @@ public class VentanaPrincipal extends JFrame {
 	private JToggleButton btnRect;
 	private final ButtonGroup botonesHerramientas = new ButtonGroup();
 	private ArrayList<Punto> puntosActualizar = null;
-	private JLabel lblDebug;
+	private JCheckBox chckbxBorrar;
 
 
 
@@ -79,8 +80,8 @@ public class VentanaPrincipal extends JFrame {
 		botonesHerramientas.add(btnRect);
 		panelLateral.add(btnRect);
 		
-		lblDebug = new JLabel("debug");
-		panelLateral.add(lblDebug);
+		chckbxBorrar = new JCheckBox("Borrar");
+		panelLateral.add(chckbxBorrar);
 		
 		panel = new JPanel();
 		contentPane.add(panel, BorderLayout.CENTER);
@@ -92,6 +93,11 @@ public class VentanaPrincipal extends JFrame {
 		panelPizarra = new PanelPizarra(new Pizarra(new boolean[pizarraWidth][pizarraHeight], "Pintor"));
 
 		panelPizarra.addMouseListener(new MouseAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
+			 * Al soltar el mouse, actualiza la matriz de la pizarra
+			 */
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (btnLapiz.isSelected()){
@@ -101,6 +107,11 @@ public class VentanaPrincipal extends JFrame {
 				}
 				
 			}
+			/*
+			 * (non-Javadoc)
+			 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
+			 * Al presionar el mouse, crea el array donde guardar los cambios realizados
+			 */
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (puntosActualizar == null)
