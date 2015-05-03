@@ -10,11 +10,13 @@ public class InterfazServidorClienteImpl implements InterfazServidorCliente {
 	
 	public void actualizar(Punto[] puntos){
 		
-		
-		for(Punto p:puntos){
-			
-			pizarra.getMatriz()[p.posicion.x][p.posicion.y]=p.estado;
-		
-		}
+		pizarra.actualizarMatriz(puntos);
 	}
+
+	public InterfazServidorClienteImpl(Pizarra pizarra) {
+		super();
+		this.pizarra = pizarra;
+	}
+	
+	
 }

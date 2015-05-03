@@ -37,7 +37,7 @@ public class Pizarra {
 		this.pintor = pintor;
 	}
 	
-	public void actualizarMatriz(ArrayList<Punto> puntos){
+	public synchronized void  actualizarMatriz(Punto[] puntos){
 		
 		for (Punto p : puntos)
 			matriz[p.posicion.x][p.posicion.y] = p.estado;

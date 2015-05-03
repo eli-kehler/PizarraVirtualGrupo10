@@ -1,5 +1,6 @@
 package py.una.pol.distribuidos.pizarra.cliente.gui;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
@@ -25,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
@@ -37,6 +39,7 @@ import java.util.Hashtable;
 import javax.swing.JToggleButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JSlider;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -52,11 +55,10 @@ public class VentanaPrincipal extends JFrame {
 	private JCheckBox chckbxBorrar;
 
 
-
 	/**
 	 * Create the frame.
 	 */
-	public VentanaPrincipal() {
+	public VentanaPrincipal(Pizarra pizarra) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 502, 288);
 		contentPane = new JPanel();
@@ -101,7 +103,8 @@ public class VentanaPrincipal extends JFrame {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (btnLapiz.isSelected()){
-					panelPizarra.getPizarra().actualizarMatriz(puntosActualizar);
+					panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+					panelPizarra.repaint();
 					puntosActualizar = null;
 					
 				}
@@ -144,4 +147,48 @@ public class VentanaPrincipal extends JFrame {
 		panelPizarra.setMaximumSize(new Dimension(pizarraWidth, pizarraHeight));
 		panel.add(panelPizarra);
 	}
+	
+	
+	public static void main(String[] args){
+		/*
+		 * Iniciar la GUI
+		 */
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				VentanaPrincipal frame = new VentanaPrincipal(null);
+				try{
+					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+						if("Nimbus".equals(info.getName())){
+							UIManager.setLookAndFeel(info.getClassName());
+							break;
+						}
+				} catch (ClassNotFoundException | InstantiationException
+				| IllegalAccessException
+				| UnsupportedLookAndFeelException e2) {
+					try {
+						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					} catch (ClassNotFoundException | InstantiationException
+							| IllegalAccessException
+							| UnsupportedLookAndFeelException e1) {
+						try {
+							UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+						} catch (ClassNotFoundException | InstantiationException
+								| IllegalAccessException
+								| UnsupportedLookAndFeelException e) {
+							JOptionPane.showMessageDialog(frame, "Error configurando LookAndFeel", "Error 01", JOptionPane.ERROR_MESSAGE);
+							e.printStackTrace();
+						}
+					}
+				}
+				
+				try {
+					
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
 }
