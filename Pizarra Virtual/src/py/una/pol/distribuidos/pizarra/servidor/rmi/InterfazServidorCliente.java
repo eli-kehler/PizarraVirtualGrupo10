@@ -1,5 +1,5 @@
 
-package py.una.pol.distribuidos.pizarra.cliente.ServidorCliente;
+package py.una.pol.distribuidos.pizarra.servidor.rmi;
 
 import java.rmi.Remote;
 
