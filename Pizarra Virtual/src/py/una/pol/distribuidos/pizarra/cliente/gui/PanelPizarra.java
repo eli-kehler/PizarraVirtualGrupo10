@@ -122,5 +122,10 @@ public class PanelPizarra extends JPanel {
 	public Pizarra getPizarra() {
 		return pizarra;
 	}
+	public ClienteRMI getCliente() {
+		return cliente;
+	}
+	
+	
 
 }
