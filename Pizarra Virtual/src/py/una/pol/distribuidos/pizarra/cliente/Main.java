@@ -4,7 +4,10 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -32,34 +35,31 @@ public class Main {
 		 */
 		
 		try {
-			ClienteRMI cliente = new ClienteRMI("127.0.0.1", 1099);
+			ClienteRMI cliente = new ClienteRMI("127.0.1.1", 1099);
 			Dimension dimensiones = cliente.obtenerDimensiones();
 			
-			
+			final int puerto = 44444;
 			/*
 			 * Encontrar puerto abierto
 			 */
 			
-			
-			ServerSocket s = new ServerSocket();
+			/*
+			Socket s = new Socket();
+			s.connect(new InetSocketAddress("127.0.0.1", 1099), 5);
 			int puerto = s.getLocalPort();
 			s.close();
-
-			String pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
-			while (!cliente.registrarCliente(pintor, InetAddress.getLocalHost(), puerto)){
-
-				pintor = JOptionPane.showInputDialog("Nombre utilizado. Ingrese el nombre del pintor.", "");
-			}
-			Pizarra p = new Pizarra(cliente.getMatriz(), pintor);
-			
-			
-			
-			
+			*/
+			Pizarra p = new Pizarra(" ");
 			
 			/*
 			 * Comentario: Esto debe ir antes de llamar a registrarCliente(), pues
-			 * si el objeto remoto no existe el metodo siempre devolverá false.
+			 * si el objeto remoto no existe el metodo siempre devolverï¿½ false.
 			 */
+			
+
+
+			String pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
+		
 			
 			/**
 			 * Iniciar el servidor para recibir actualizaciones
@@ -67,11 +67,21 @@ public class Main {
 			new Thread(new Runnable(){
 				public void run(){
 					
-					new ServidorCliente(p, puerto);
+					new ServidorCliente(p,puerto).iniciarServidor(pintor, cliente);
 					
 				}
 			}).start();
+			/*
+			while (!cliente.registrarCliente(pintor, InetAddress.getLocalHost().getHostAddress(), 4746)){
+
+				pintor = JOptionPane.showInputDialog("Nombre utilizado. Ingrese el nombre del pintor.", "");
+			}
+			*/
 			
+			p.setMatriz(cliente.getMatriz());
+			p.setPintor(pintor);
+			
+
 			/*
 			 * Iniciar la GUI
 			 */
@@ -114,15 +124,11 @@ public class Main {
 			
 			
 		} catch (RemoteException | NotBoundException e3) {
-			JOptionPane.showMessageDialog(new JFrame(), "Error de RMI. Saliendo...");
+			JOptionPane.showMessageDialog(new JFrame(), "Error de RMI.\nMensaje:\n" + e3.getMessage());
 			e3.printStackTrace();
 			System.exit(1);
-		} catch (UnknownHostException e) {
-			JOptionPane.showMessageDialog(new JFrame(), "Error reconociendo host local. Saliendo...");
-			e.printStackTrace();
-			System.exit(1);
 		} catch (IOException e1) {
-			JOptionPane.showMessageDialog(new JFrame(), "No existe puertos disponibles");
+			JOptionPane.showMessageDialog(new JFrame(), "No existe puertos disponibles.\nMensaje:\n" + e1.getMessage());
 			e1.printStackTrace();
 			System.exit(1);
 		}
