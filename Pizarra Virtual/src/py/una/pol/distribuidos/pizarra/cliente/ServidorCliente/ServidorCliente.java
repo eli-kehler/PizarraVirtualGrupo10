@@ -2,6 +2,7 @@
 package py.una.pol.distribuidos.pizarra.cliente.ServidorCliente;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -17,10 +18,9 @@ public class ServidorCliente {
 	public ServidorCliente(Pizarra pizarra, int puerto){
 		this.pizarra = pizarra;
 		this.puerto = puerto;
-		iniciarServidor(pizarra.getPintor());
 	}
 	
-	public void iniciarServidor(String nombre){
+	public void iniciarServidor(String nombre, ClienteRMI cliente){
 
 
 		/*
@@ -29,6 +29,8 @@ public class ServidorCliente {
 		try{
 			Registry registry = LocateRegistry.createRegistry(puerto);
 			registry.rebind(nombre, new InterfazServidorClienteImpl(pizarra));
+			
+			cliente.registrarCliente(nombre, InetAddress.getLocalHost().getHostAddress(), puerto);
 		
 		}catch(Exception e){
 			e.printStackTrace();
