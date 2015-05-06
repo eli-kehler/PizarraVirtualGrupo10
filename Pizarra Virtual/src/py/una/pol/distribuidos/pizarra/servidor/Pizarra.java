@@ -8,10 +8,13 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import py.una.pol.distribuidos.pizarra.servidor.rmi.InterfazServidorCliente;
 
 public class Pizarra implements PizarraInterfaz
 {
@@ -58,7 +61,7 @@ public class Pizarra implements PizarraInterfaz
 		
 		try
 		{
-			Object cliente = registry.lookup(nombre);
+			InterfazServidorCliente cliente = (InterfazServidorCliente)registry.lookup(nombre);
 			notificador.clientes.add(cliente);
 		} catch (NotBoundException e)
 		{
@@ -94,7 +97,7 @@ public class Pizarra implements PizarraInterfaz
 	 * retornará true.
 	 */
 	@Override
-	public boolean actualizar(Punto[] puntos) throws RemoteException
+	public synchronized boolean actualizar(Punto[] puntos) throws RemoteException
 	{
 		boolean liberar = false;
 		try
@@ -127,7 +130,7 @@ public class Pizarra implements PizarraInterfaz
 	private class Notificador implements Runnable {
 		
 		// Lista de Objetos a Clientes remotos (en caso de utilizarlos para notificarlos de eventos)
-		public ArrayList<Object> clientes = null;
+		public ArrayList<InterfazServidorCliente> clientes = null;
 		public TreeMap<Point, Boolean> puntos = null;
 		
 		public Notificador()
@@ -142,9 +145,28 @@ public class Pizarra implements PizarraInterfaz
 		public void run()
 		{
 			
-			// proceso de actualizacion
+			// Si hay cambios que realizar
+			if (!puntos.isEmpty())
+			{
+				Punto listaPuntos [] = new Punto[puntos.size()];
+				int k = 0;
+				
+				// Genera la lista de puntos a enviar
+				for (Map.Entry<Point, Boolean> entry : puntos.entrySet())
+				{
+					listaPuntos[k++] = new Punto(entry.getKey(), entry.getValue());				
+				}
+				
+				// Actualiza los clientes
+				for (InterfazServidorCliente cliente : clientes)
+				{
+					cliente.actualizar(listaPuntos);
+				}
 			
-			puntos.clear();
+
+				puntos.clear();
+			}
+			
 			try
 			{
 				Thread.sleep(10);  // Actualiza cada 10 milisegundos

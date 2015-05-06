@@ -32,6 +32,7 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -47,9 +48,6 @@ public class VentanaPrincipal extends JFrame {
 	private PanelPizarra panelPizarra;
 	private JPanel panelLateral;
 	private JPanel panel;
-	private JToggleButton btnLapiz;
-	private JToggleButton btnLinea;
-	private JToggleButton btnRect;
 	private final ButtonGroup botonesHerramientas = new ButtonGroup();
 	private ArrayList<Punto> puntosActualizar = null;
 	private JCheckBox chckbxBorrar;
@@ -69,18 +67,6 @@ public class VentanaPrincipal extends JFrame {
 		panelLateral = new JPanel();
 		contentPane.add(panelLateral, BorderLayout.EAST);
 		panelLateral.setLayout(new BoxLayout(panelLateral, BoxLayout.Y_AXIS));
-		
-		btnLapiz = new JToggleButton("Lapiz");
-		botonesHerramientas.add(btnLapiz);
-		panelLateral.add(btnLapiz);
-		
-		btnLinea = new JToggleButton("Linea");
-		botonesHerramientas.add(btnLinea);
-		panelLateral.add(btnLinea);
-		
-		btnRect = new JToggleButton("Rectangulo");
-		botonesHerramientas.add(btnRect);
-		panelLateral.add(btnRect);
 		
 		chckbxBorrar = new JCheckBox("Borrar");
 		panelLateral.add(chckbxBorrar);
@@ -102,12 +88,19 @@ public class VentanaPrincipal extends JFrame {
 			 */
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if (btnLapiz.isSelected()){
+				
 					panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+					try {
+						panelPizarra.getCliente().sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+					} catch (RemoteException e1) {
+						JOptionPane.showMessageDialog(e.getComponent().getParent(), "Error al conectar con servidor",
+								"Error RMI", JOptionPane.ERROR_MESSAGE);
+						e1.printStackTrace();
+					}
 					panelPizarra.repaint();
 					puntosActualizar = null;
 					
-				}
+				
 				
 			}
 			/*
@@ -128,16 +121,16 @@ public class VentanaPrincipal extends JFrame {
 				int y = e.getY();
 				
 				if (x >= 0 && x < panel.getWidth() && y >= 0 && y < panel.getHeight()){
-					if (btnLapiz.isSelected()){
-						if (!chckbxBorrar.isSelected()){
-							panelPizarra.pintar(new Rectangle(x, y, 1, 1));
-							puntosActualizar.add(new Punto(e.getPoint(), true));
-						} else {
-							panelPizarra.borrar(new Rectangle(x,y, 1, 1));
-							puntosActualizar.add(new Punto(e.getPoint(), false));
-						}
-						
+					
+					if (!chckbxBorrar.isSelected()){
+						panelPizarra.pintar(new Rectangle(x, y, 1, 1));
+						puntosActualizar.add(new Punto(e.getPoint(), true));
+					} else {
+						panelPizarra.borrar(new Rectangle(x,y, 1, 1));
+						puntosActualizar.add(new Punto(e.getPoint(), false));
 					}
+					
+				
 				}
 			}
 

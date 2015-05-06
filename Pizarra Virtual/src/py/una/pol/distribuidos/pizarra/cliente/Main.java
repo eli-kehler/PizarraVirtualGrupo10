@@ -52,6 +52,15 @@ public class Main {
 			}
 			Pizarra p = new Pizarra(cliente.getMatriz(), pintor);
 			
+			
+			
+			
+			
+			/*
+			 * Comentario: Esto debe ir antes de llamar a registrarCliente(), pues
+			 * si el objeto remoto no existe el metodo siempre devolverá false.
+			 */
+			
 			/**
 			 * Iniciar el servidor para recibir actualizaciones
 			 */
