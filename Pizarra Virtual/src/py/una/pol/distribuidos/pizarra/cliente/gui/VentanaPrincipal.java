@@ -16,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 
 import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
 import py.una.pol.distribuidos.pizarra.cliente.gui.PanelPizarra;
+import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
 import java.awt.event.MouseMotionAdapter;
@@ -51,12 +52,16 @@ public class VentanaPrincipal extends JFrame {
 	private final ButtonGroup botonesHerramientas = new ButtonGroup();
 	private ArrayList<Punto> puntosActualizar = null;
 	private JCheckBox chckbxBorrar;
+	private ClienteRMI cliente;
 
 
 	/**
 	 * Create the frame.
 	 */
-	public VentanaPrincipal(Pizarra pizarra) {
+	public VentanaPrincipal(Pizarra pizarra, ClienteRMI cliente) {
+		
+		this.cliente = cliente;
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 502, 288);
 		contentPane = new JPanel();
@@ -76,9 +81,9 @@ public class VentanaPrincipal extends JFrame {
 		
 		//TODO obtener dimensiones
 		int pizarraWidth, pizarraHeight;
-		pizarraWidth = 640;
-		pizarraHeight = 480;
-		panelPizarra = new PanelPizarra(new Pizarra(new boolean[pizarraWidth][pizarraHeight], "Pintor"));
+		pizarraWidth = pizarra.getDimension().width;
+		pizarraHeight = pizarra.getDimension().height;
+		panelPizarra = new PanelPizarra(pizarra);
 
 		panelPizarra.addMouseListener(new MouseAdapter() {
 			/*
@@ -88,19 +93,21 @@ public class VentanaPrincipal extends JFrame {
 			 */
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				
-					panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+				if (puntosActualizar.size() > 0){
+					
 					try {
-						panelPizarra.getCliente().sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+						cliente.sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+						panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
 					} catch (RemoteException e1) {
-						JOptionPane.showMessageDialog(e.getComponent().getParent(), "Error al conectar con servidor",
+						JOptionPane.showMessageDialog(e.getComponent().getParent(), "Error al conectar con servidor\n" + e1.getMessage(),
 								"Error RMI", JOptionPane.ERROR_MESSAGE);
 						e1.printStackTrace();
+
 					}
 					panelPizarra.repaint();
 					puntosActualizar = null;
 					
-				
+				}
 				
 			}
 			/*
@@ -117,6 +124,10 @@ public class VentanaPrincipal extends JFrame {
 		panelPizarra.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				
+				/**
+				 * Al hacer un "drag" del mouse, se pinta o se borra
+				 */
 				int x = e.getX();
 				int y = e.getY();
 				
@@ -148,7 +159,7 @@ public class VentanaPrincipal extends JFrame {
 		 */
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				VentanaPrincipal frame = new VentanaPrincipal(null);
+				VentanaPrincipal frame = new VentanaPrincipal(null, null);
 				try{
 					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
 						if("Nimbus".equals(info.getName())){

@@ -113,10 +113,11 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 				for (Punto punto : puntos)
 				{
 					pizarra_temp[punto.posicion.y][punto.posicion.x] = punto.estado;
-					notificador.puntos.put(punto.posicion, punto.estado);
+					notificador.puntos.add(punto);
 				}
 				
 				pizarra = pizarra_temp;
+				System.out.println("ACTUALIZADO");
 				return true;
 			}
 		} catch (InterruptedException e)
@@ -136,14 +137,14 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 		
 		// Lista de Objetos a Clientes remotos (en caso de utilizarlos para notificarlos de eventos)
 		public ArrayList<InterfazServidorCliente> clientes = null;
-		public TreeMap<Point, Boolean> puntos = null;
+		public ArrayList<Punto> puntos = null;
 		
 		public Notificador()
 		{
 			super();
 			
 			clientes = new ArrayList<>();
-			puntos = new TreeMap<>();
+			puntos = new ArrayList<>();
 		}
 		
 		@Override
@@ -153,20 +154,12 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 			// Si hay cambios que realizar
 			if (!puntos.isEmpty())
 			{
-				Punto listaPuntos [] = new Punto[puntos.size()];
-				int k = 0;
-				
-				// Genera la lista de puntos a enviar
-				for (Map.Entry<Point, Boolean> entry : puntos.entrySet())
-				{
-					listaPuntos[k++] = new Punto(entry.getKey(), entry.getValue());				
-				}
 				
 				// Actualiza los clientes
 				for (InterfazServidorCliente cliente : clientes)
 				{
 					try {
-						cliente.actualizar(listaPuntos);
+						cliente.actualizar(puntos.toArray(new Punto[puntos.size()]));
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
