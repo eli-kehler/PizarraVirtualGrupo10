@@ -1,6 +1,8 @@
 
 package py.una.pol.distribuidos.pizarra.cliente.ServidorCliente;
 
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -15,7 +17,12 @@ public class InterfazServidorClienteImpl extends UnicastRemoteObject implements 
 	public void actualizar(Punto[] puntos)throws RemoteException{
 		
 		pizarra.getPizarra().actualizarMatriz(puntos);
-		pizarra.repaint();
+		for (Punto p : puntos){
+			if (p.estado)
+				pizarra.pintar(new Rectangle(p.posicion, new Dimension(1, 1)));
+			else
+				pizarra.borrar(new Rectangle(p.posicion, new Dimension(1, 1)));
+		}
 		
 	}
 

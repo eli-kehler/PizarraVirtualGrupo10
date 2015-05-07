@@ -44,9 +44,6 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 		pizarra = new boolean[height][width];
 		delay = 0;
 		notificador = new Notificador();
-	
-		for (int x = 10; x < 100; x++)
-			pizarra[x][x] = true;
 		
 		new Thread(notificador).start();
 	}
