@@ -8,14 +8,15 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
+import py.una.pol.distribuidos.pizarra.cliente.gui.PanelPizarra;
 import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
 
 
 public class ServidorCliente {
-	private Pizarra pizarra;
+	private PanelPizarra pizarra;
 	private int puerto;
 	
-	public ServidorCliente(Pizarra pizarra, int puerto){
+	public ServidorCliente(PanelPizarra pizarra, int puerto){
 		this.pizarra = pizarra;
 		this.puerto = puerto;
 	}

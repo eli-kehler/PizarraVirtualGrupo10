@@ -2,29 +2,27 @@ package py.una.pol.distribuidos.pizarra.servidor;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.net.InetAddress;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import py.una.pol.distribuidos.pizarra.cliente.ServidorCliente.InterfazServidorCliente;
 public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6999988334775339800L;
+	
 	// Constantes de ANCHURA y ALTURA de la Pizarra
 	public static final int WIDTH = 1024;
 	public static final int HEIGHT = 700;
+	
+	// Tiempo que pasa para que el Servidor envie la matriz completa
+	public static final int DELAY = 100;
 	
 	// Objeto que se encarga de realizar las notificaciones
 	private Notificador notificador = null;
@@ -33,10 +31,8 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 	private boolean[][] pizarra = null;
 	private int width;
 	private int height;
+	private int delay;
 	
-	
-	// Semaforo utilizado para controlar la concurrencia
-	private Lock semaforo;
 	
 	/* Constructor por defecto */
 	public Pizarra() throws RemoteException
@@ -46,8 +42,11 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 		width = WIDTH;
 		height = HEIGHT;
 		pizarra = new boolean[height][width];
-		semaforo = new ReentrantLock();
+		delay = 0;
 		notificador = new Notificador();
+	
+		for (int x = 10; x < 100; x++)
+			pizarra[x][x] = true;
 		
 		new Thread(notificador).start();
 	}
@@ -60,13 +59,16 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 	public boolean Registrar(String nombre, String direccion, int puerto)
 			throws RemoteException
 	{
-	
+		
+		if (notificador.clientNames.contains(nombre)) return false;
+		
 		Registry registry = LocateRegistry.getRegistry(direccion, puerto);
 		
 		try
 		{
 			InterfazServidorCliente cliente = (InterfazServidorCliente)registry.lookup(nombre);
 			notificador.clientes.add(cliente);
+			notificador.clientNames.add(nombre);
 			System.out.println(nombre + " REGISTRADO");
 		} catch (NotBoundException e)
 		{
@@ -94,21 +96,13 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 		return pizarra;
 	}
 
-	/* Permite a un Cliente enviar una serie de puntos que fueron modificados
-	 *  
-	 * M�todo concurrente; si un Cliente intenta utilizar el m�todo y est� bloqueado,
-	 * esperar� 5 milisegundos a que se libere, si no consigue utilizar el m�todo en ese
-	 * tiempo se rendir� y el m�todo retornar� false. Si el m�todo se ejecut� correctamente
-	 * retornar� true.
+	/* 
+	 * Permite a un Cliente enviar una serie de puntos que fueron modificados
 	 */
 	@Override
 	public synchronized boolean actualizar(Punto[] puntos) throws RemoteException
 	{
-		boolean liberar = false;
-		try
-		{
-			if (liberar = semaforo.tryLock(5, TimeUnit.MILLISECONDS))
-			{
+	
 				boolean[][] pizarra_temp = pizarra;
 				for (Punto punto : puntos)
 				{
@@ -118,24 +112,14 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 				
 				pizarra = pizarra_temp;
 				return true;
-			}
-		} catch (InterruptedException e)
-		{
-			e.printStackTrace();
-			return false;
-		} finally
-		{
-			if (liberar) semaforo.unlock();
-			
-		}
 		
-		return false;
 	}
 	
 	private class Notificador implements Runnable {
 		
 		// Lista de Objetos a Clientes remotos (en caso de utilizarlos para notificarlos de eventos)
 		public ArrayList<InterfazServidorCliente> clientes = null;
+		public ArrayList<String> clientNames = null;
 		public TreeMap<Point, Boolean> puntos = null;
 		
 		public Notificador()
@@ -143,46 +127,108 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 			super();
 			
 			clientes = new ArrayList<>();
-			puntos = new TreeMap<>();
+			clientNames = new ArrayList<>();
+			puntos = new TreeMap<>(new Comparator<Point>(){
+               
+				@Override
+                public int compare(Point o1, Point o2) {
+					if (o1.x < o2.x) return -1;
+					else if (o1.x == o2.x)
+					{
+						if (o1.y < o2.y) return -1;
+						else if (o1.y == o2.y) return 0;
+						return 1;
+					}
+					return 1;
+				}
+				
+				/*public boolean equals(Point o1, Point o2)
+				{
+					return o1.x == o2.x && o1.y == o2.y;
+				}*/
+            });
 		}
 		
 		@Override
 		public void run()
 		{
 			
-			// Si hay cambios que realizar
-			if (!puntos.isEmpty())
+			while (true)
 			{
-				Punto listaPuntos [] = new Punto[puntos.size()];
-				int k = 0;
+				//boolean refresh = (delay > DELAY);
 				
-				// Genera la lista de puntos a enviar
-				for (Map.Entry<Point, Boolean> entry : puntos.entrySet())
-				{
-					listaPuntos[k++] = new Punto(entry.getKey(), entry.getValue());				
-				}
+	
 				
-				// Actualiza los clientes
-				for (InterfazServidorCliente cliente : clientes)
+				
+				// Si hay cambios que realizar
+				if (!puntos.isEmpty() /*|| refresh*/)
 				{
-					try {
-						cliente.actualizar(listaPuntos);
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					
+					Punto listaPuntos[];
+					
+					//if (!refresh)
+					//{
+						listaPuntos = new Punto[puntos.size()];
+						int k = 0;
+						
+						// Genera la lista de puntos a enviar
+						for (Map.Entry<Point, Boolean> entry : puntos.entrySet())
+						{
+							listaPuntos[k++] = new Punto(entry.getKey(), entry.getValue());				
+						}
+					//}
+					
+					
+					//TODO
+					/*
+					else
+					{
+						listaPuntos = new Punto[width * height];
+						boolean[][] pizarra_temp = pizarra;
+						
+						int k = 0;
+						
+						for (int y = 0; y < height; y++)
+							for (int x = 0; x < width; x++)
+							{
+								listaPuntos[k++] = new Punto(new Point(x, y), pizarra_temp[y][x]);
+							}
 					}
+					*/
+					
+					
+					// Actualiza los clientes
+					//for (InterfazServidorCliente cliente : clientes)
+					// {
+					for (int z = 0; z < clientes.size(); z++)
+					{
+						InterfazServidorCliente cliente = clientes.get(z);
+						try {
+							cliente.actualizar(listaPuntos);
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							//e.printStackTrace();
+							int i = clientes.indexOf(cliente);
+							System.out.println("BORRANDO " + clientNames.get(i));
+							clientes.remove(i);
+							clientNames.remove(i);
+							
+						}
+					}
+				
+	
+					puntos.clear();
 				}
-			
-
-				puntos.clear();
-			}
-			
-			try
-			{
-				Thread.sleep(10);  // Actualiza cada 10 milisegundos
-			} catch (InterruptedException e)
-			{
-				e.printStackTrace();
+				
+				try
+				{
+					Thread.sleep(10);  // Actualiza cada 10 milisegundos
+					delay += 10;
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+		
 			}
 		}
 		

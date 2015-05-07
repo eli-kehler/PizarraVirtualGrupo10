@@ -1,46 +1,28 @@
 package py.una.pol.distribuidos.pizarra.cliente.gui;
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 
-import javax.swing.JDialog;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
-import py.una.pol.distribuidos.pizarra.cliente.gui.PanelPizarra;
+import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
-
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
-
-import javax.swing.JLabel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-
-import javax.swing.JToggleButton;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JSlider;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -48,15 +30,14 @@ public class VentanaPrincipal extends JFrame {
 	private PanelPizarra panelPizarra;
 	private JPanel panelLateral;
 	private JPanel panel;
-	private final ButtonGroup botonesHerramientas = new ButtonGroup();
 	private ArrayList<Punto> puntosActualizar = null;
 	private JCheckBox chckbxBorrar;
-
-
+	
 	/**
 	 * Create the frame.
 	 */
-	public VentanaPrincipal(Pizarra pizarra) {
+	public VentanaPrincipal(PanelPizarra pizarra, final ClienteRMI cliente) {
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 502, 288);
 		contentPane = new JPanel();
@@ -74,38 +55,34 @@ public class VentanaPrincipal extends JFrame {
 		panel = new JPanel();
 		contentPane.add(panel, BorderLayout.CENTER);
 		
-		//TODO obtener dimensiones
-		int pizarraWidth, pizarraHeight;
-		pizarraWidth = 640;
-		pizarraHeight = 480;
-		panelPizarra = new PanelPizarra(new Pizarra(new boolean[pizarraWidth][pizarraHeight], "Pintor"));
+		this.panelPizarra = pizarra;
 
 		panelPizarra.addMouseListener(new MouseAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
+			
+			
+			/**
 			 * Al soltar el mouse, actualiza la matriz de la pizarra
 			 */
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				
-					panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+				if (puntosActualizar.size() > 0){
+					
 					try {
-						panelPizarra.getCliente().sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+						cliente.sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+						panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
 					} catch (RemoteException e1) {
-						JOptionPane.showMessageDialog(e.getComponent().getParent(), "Error al conectar con servidor",
+						JOptionPane.showMessageDialog(e.getComponent().getParent(), "Error al conectar con servidor\n" + e1.getMessage(),
 								"Error RMI", JOptionPane.ERROR_MESSAGE);
 						e1.printStackTrace();
+
 					}
 					panelPizarra.repaint();
 					puntosActualizar = null;
 					
-				
+				}
 				
 			}
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
+			/**
 			 * Al presionar el mouse, crea el array donde guardar los cambios realizados
 			 */
 			@Override
@@ -117,6 +94,10 @@ public class VentanaPrincipal extends JFrame {
 		panelPizarra.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				
+				/**
+				 * Al hacer un "drag" del mouse, se pinta o se borra
+				 */
 				int x = e.getX();
 				int y = e.getY();
 				
@@ -135,20 +116,26 @@ public class VentanaPrincipal extends JFrame {
 			}
 
 		});
-		panelPizarra.setPreferredSize(new Dimension(pizarraWidth, pizarraHeight));
-		panelPizarra.setMinimumSize(new Dimension(pizarraWidth, pizarraHeight));
-		panelPizarra.setMaximumSize(new Dimension(pizarraWidth, pizarraHeight));
+		/**
+		 * Setea el tamaño del panel
+		 */
+		
+		Dimension pizarraSize = panelPizarra.getPizarra().getDimension();
+		panelPizarra.setPreferredSize(pizarraSize);
+		panelPizarra.setMinimumSize(pizarraSize);
+		panelPizarra.setMaximumSize(pizarraSize);
 		panel.add(panelPizarra);
 	}
 	
 	
 	public static void main(String[] args){
-		/*
+		
+		/**
 		 * Iniciar la GUI
 		 */
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				VentanaPrincipal frame = new VentanaPrincipal(null);
+				VentanaPrincipal frame = new VentanaPrincipal(null, null);
 				try{
 					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
 						if("Nimbus".equals(info.getName())){
