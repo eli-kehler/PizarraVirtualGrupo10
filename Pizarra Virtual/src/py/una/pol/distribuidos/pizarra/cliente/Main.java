@@ -3,12 +3,6 @@ package py.una.pol.distribuidos.pizarra.cliente;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
@@ -35,15 +29,15 @@ public class Main {
 		 */
 		
 		try {
-			ClienteRMI cliente = new ClienteRMI("127.0.1.1", 1099);
+			final ClienteRMI cliente = new ClienteRMI("127.0.1.1", 1099);
 			Dimension dimensiones = cliente.obtenerDimensiones();
 			
 			final int puerto = 44444;
 			
 
 
-			String pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
-			Pizarra p = new Pizarra(cliente.getMatriz(), pintor);
+			final String pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
+			final Pizarra p = new Pizarra(cliente.getMatriz(), pintor);
 			
 			/**
 			 * Iniciar el servidor para recibir actualizaciones
