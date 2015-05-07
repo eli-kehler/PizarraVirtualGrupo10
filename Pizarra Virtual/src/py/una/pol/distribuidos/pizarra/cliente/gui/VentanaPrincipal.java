@@ -1,47 +1,28 @@
 package py.una.pol.distribuidos.pizarra.cliente.gui;
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 
-import javax.swing.JDialog;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
-import py.una.pol.distribuidos.pizarra.cliente.gui.PanelPizarra;
 import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
-
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
-
-import javax.swing.JLabel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-
-import javax.swing.JToggleButton;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JSlider;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -58,7 +39,7 @@ public class VentanaPrincipal extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VentanaPrincipal(Pizarra pizarra, ClienteRMI cliente) {
+	public VentanaPrincipal(Pizarra pizarra, final ClienteRMI cliente) {
 		
 		this.cliente = cliente;
 		
