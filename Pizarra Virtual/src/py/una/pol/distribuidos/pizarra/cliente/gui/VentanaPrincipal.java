@@ -30,18 +30,13 @@ public class VentanaPrincipal extends JFrame {
 	private PanelPizarra panelPizarra;
 	private JPanel panelLateral;
 	private JPanel panel;
-	private final ButtonGroup botonesHerramientas = new ButtonGroup();
 	private ArrayList<Punto> puntosActualizar = null;
 	private JCheckBox chckbxBorrar;
-	private ClienteRMI cliente;
-
-
+	
 	/**
 	 * Create the frame.
 	 */
-	public VentanaPrincipal(Pizarra pizarra, final ClienteRMI cliente) {
-		
-		this.cliente = cliente;
+	public VentanaPrincipal(PanelPizarra pizarra, final ClienteRMI cliente) {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 502, 288);
@@ -60,16 +55,12 @@ public class VentanaPrincipal extends JFrame {
 		panel = new JPanel();
 		contentPane.add(panel, BorderLayout.CENTER);
 		
-		//TODO obtener dimensiones
-		int pizarraWidth, pizarraHeight;
-		pizarraWidth = pizarra.getDimension().width;
-		pizarraHeight = pizarra.getDimension().height;
-		panelPizarra = new PanelPizarra(pizarra);
+		this.panelPizarra = pizarra;
 
 		panelPizarra.addMouseListener(new MouseAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
+			
+			
+			/**
 			 * Al soltar el mouse, actualiza la matriz de la pizarra
 			 */
 			@Override
@@ -91,9 +82,7 @@ public class VentanaPrincipal extends JFrame {
 				}
 				
 			}
-			/*
-			 * (non-Javadoc)
-			 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
+			/**
 			 * Al presionar el mouse, crea el array donde guardar los cambios realizados
 			 */
 			@Override
@@ -127,15 +116,21 @@ public class VentanaPrincipal extends JFrame {
 			}
 
 		});
-		panelPizarra.setPreferredSize(new Dimension(pizarraWidth, pizarraHeight));
-		panelPizarra.setMinimumSize(new Dimension(pizarraWidth, pizarraHeight));
-		panelPizarra.setMaximumSize(new Dimension(pizarraWidth, pizarraHeight));
+		/**
+		 * Setea el tamaño del panel
+		 */
+		
+		Dimension pizarraSize = panelPizarra.getPizarra().getDimension();
+		panelPizarra.setPreferredSize(pizarraSize);
+		panelPizarra.setMinimumSize(pizarraSize);
+		panelPizarra.setMaximumSize(pizarraSize);
 		panel.add(panelPizarra);
 	}
 	
 	
 	public static void main(String[] args){
-		/*
+		
+		/**
 		 * Iniciar la GUI
 		 */
 		EventQueue.invokeLater(new Runnable() {

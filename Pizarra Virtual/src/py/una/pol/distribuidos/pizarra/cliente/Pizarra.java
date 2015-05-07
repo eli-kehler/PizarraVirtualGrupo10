@@ -41,7 +41,7 @@ public class Pizarra {
 		
 		for (Punto p : puntos)
 		{
-			if (puntos.length < 10)
+			//if (puntos.length < 10)
 			//System.out.printf(" %d << Modificando (%d, %d) = %s\n", puntos.length , p.posicion.x, p.posicion.y, Boolean.toString(p.estado));
 	
 			matriz[p.posicion.y][p.posicion.x] = p.estado;

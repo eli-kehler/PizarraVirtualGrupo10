@@ -155,19 +155,19 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 			
 			while (true)
 			{
-				boolean refresh = (delay > DELAY);
+				//boolean refresh = (delay > DELAY);
 				
 	
 				
 				
 				// Si hay cambios que realizar
-				if (!puntos.isEmpty() || refresh)
+				if (!puntos.isEmpty() /*|| refresh*/)
 				{
 					
 					Punto listaPuntos[];
 					
-					if (!refresh)
-					{
+					//if (!refresh)
+					//{
 						listaPuntos = new Punto[puntos.size()];
 						int k = 0;
 						
@@ -176,7 +176,11 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 						{
 							listaPuntos[k++] = new Punto(entry.getKey(), entry.getValue());				
 						}
-					}
+					//}
+					
+					
+					//TODO
+					/*
 					else
 					{
 						listaPuntos = new Punto[width * height];
@@ -190,6 +194,9 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 								listaPuntos[k++] = new Punto(new Point(x, y), pizarra_temp[y][x]);
 							}
 					}
+					*/
+					
+					
 					// Actualiza los clientes
 					//for (InterfazServidorCliente cliente : clientes)
 					// {
