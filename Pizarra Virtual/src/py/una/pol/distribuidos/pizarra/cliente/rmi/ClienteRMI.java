@@ -31,7 +31,7 @@ public class ClienteRMI {
 		
 	}
 	
-	public boolean registrarCliente(String nombre, InetAddress address, int port) throws RemoteException, NotBoundException{
+	public boolean registrarCliente(String nombre, String address, int port) throws RemoteException, NotBoundException{
 
 		return impl.Registrar(nombre, address, port);
 		

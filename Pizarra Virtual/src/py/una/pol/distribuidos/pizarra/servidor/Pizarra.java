@@ -7,6 +7,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,10 +15,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import py.una.pol.distribuidos.pizarra.servidor.rmi.InterfazServidorCliente;
-
-public class Pizarra implements PizarraInterfaz
+import py.una.pol.distribuidos.pizarra.cliente.ServidorCliente.InterfazServidorCliente;
+public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6999988334775339800L;
 	// Constantes de ANCHURA y ALTURA de la Pizarra
 	public static final int WIDTH = 1024;
 	public static final int HEIGHT = 700;
@@ -35,7 +39,7 @@ public class Pizarra implements PizarraInterfaz
 	private Lock semaforo;
 	
 	/* Constructor por defecto */
-	public Pizarra()
+	public Pizarra() throws RemoteException
 	{
 		super();
 		
@@ -53,16 +57,17 @@ public class Pizarra implements PizarraInterfaz
 	 *  Retorna verdadero si el servidor pudo establecer la conexion, falso
 	 * en caso contrario */
 	@Override
-	public boolean Registrar(String nombre, InetAddress direccion, int puerto)
+	public boolean Registrar(String nombre, String direccion, int puerto)
 			throws RemoteException
 	{
 	
-		Registry registry = LocateRegistry.getRegistry(direccion.toString(), puerto);
+		Registry registry = LocateRegistry.getRegistry(direccion, puerto);
 		
 		try
 		{
 			InterfazServidorCliente cliente = (InterfazServidorCliente)registry.lookup(nombre);
 			notificador.clientes.add(cliente);
+			System.out.println(nombre + " REGISTRADO");
 		} catch (NotBoundException e)
 		{
 			e.printStackTrace();
@@ -91,10 +96,10 @@ public class Pizarra implements PizarraInterfaz
 
 	/* Permite a un Cliente enviar una serie de puntos que fueron modificados
 	 *  
-	 * Método concurrente; si un Cliente intenta utilizar el método y está bloqueado,
-	 * esperará 5 milisegundos a que se libere, si no consigue utilizar el método en ese
-	 * tiempo se rendirá y el método retornará false. Si el método se ejecutó correctamente
-	 * retornará true.
+	 * Mï¿½todo concurrente; si un Cliente intenta utilizar el mï¿½todo y estï¿½ bloqueado,
+	 * esperarï¿½ 5 milisegundos a que se libere, si no consigue utilizar el mï¿½todo en ese
+	 * tiempo se rendirï¿½ y el mï¿½todo retornarï¿½ false. Si el mï¿½todo se ejecutï¿½ correctamente
+	 * retornarï¿½ true.
 	 */
 	@Override
 	public synchronized boolean actualizar(Punto[] puntos) throws RemoteException
@@ -160,7 +165,12 @@ public class Pizarra implements PizarraInterfaz
 				// Actualiza los clientes
 				for (InterfazServidorCliente cliente : clientes)
 				{
-					cliente.actualizar(listaPuntos);
+					try {
+						cliente.actualizar(listaPuntos);
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			
 
