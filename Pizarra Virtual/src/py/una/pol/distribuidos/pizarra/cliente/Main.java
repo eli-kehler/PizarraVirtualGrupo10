@@ -39,27 +39,11 @@ public class Main {
 			Dimension dimensiones = cliente.obtenerDimensiones();
 			
 			final int puerto = 44444;
-			/*
-			 * Encontrar puerto abierto
-			 */
-			
-			/*
-			Socket s = new Socket();
-			s.connect(new InetSocketAddress("127.0.0.1", 1099), 5);
-			int puerto = s.getLocalPort();
-			s.close();
-			*/
-			Pizarra p = new Pizarra(" ");
-			
-			/*
-			 * Comentario: Esto debe ir antes de llamar a registrarCliente(), pues
-			 * si el objeto remoto no existe el metodo siempre devolver� false.
-			 */
 			
 
 
 			String pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
-		
+			Pizarra p = new Pizarra(cliente.getMatriz(), pintor);
 			
 			/**
 			 * Iniciar el servidor para recibir actualizaciones
@@ -87,7 +71,7 @@ public class Main {
 			 */
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					VentanaPrincipal frame = new VentanaPrincipal(p);
+					VentanaPrincipal frame = new VentanaPrincipal(p, cliente);
 					try{
 						for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
 							if("Nimbus".equals(info.getName())){
