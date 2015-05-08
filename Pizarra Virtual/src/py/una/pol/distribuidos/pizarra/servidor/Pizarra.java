@@ -29,9 +29,6 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 	private boolean[][] pizarra = null;
 	private int width;
 	private int height;
-	private int delay;
-	
-	
 	/* Constructor por defecto */
 	public Pizarra() throws RemoteException
 	{
@@ -40,7 +37,6 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 		width = WIDTH;
 		height = HEIGHT;
 		pizarra = new boolean[height][width];
-		delay = 0;
 		notificador = new Notificador();
 		
 		new Thread(notificador).start();
@@ -150,60 +146,35 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 			
 			while (true)
 			{
-			//	boolean refresh = (delay > DELAY);
-				
-	
+
 				try {
 					semaforo.acquire();
 					
 					if (puntos.isEmpty()) puntos.add(new Punto(new Point(0,0), pizarra[0][0]));
 					
 					// Si hay cambios que realizar
-					if (!puntos.isEmpty()/* || refresh*/)
+					if (!puntos.isEmpty())
 					{
 						
 						Punto listaPuntos[];
 						
-						//if (!refresh)
-						//{
+		
 							listaPuntos = new Punto[puntos.size()];
 							
 							ArrayList<Punto> puntos_temp = puntos;
 							// Genera la lista de puntos a enviar
 							listaPuntos = puntos_temp.toArray(new Punto[puntos_temp.size()]);
-						//}
-						
-						
-						//TODO
-						/*
-						else
-						{
-							listaPuntos = new Punto[width * height];
-							boolean[][] pizarra_temp = pizarra;
-							
-							int k = 0;
-							
-							for (int y = 0; y < height; y++)
-								for (int x = 0; x < width; x++)
-								{
-									listaPuntos[k++] = new Punto(new Point(x, y), pizarra_temp[y][x]);
-								}
-							delay = 0;
-						}*/
-						
-						
+
 						
 						// Actualiza los clientes
-						//for (InterfazServidorCliente cliente : clientes)
-						// {
+
 						for (int z = 0; z < clientes.size(); z++)
 						{
 							InterfazServidorCliente cliente = clientes.get(z);
 							try {
 								cliente.actualizar(listaPuntos);
 							} catch (RemoteException e) {
-								// TODO Auto-generated catch block
-								//e.printStackTrace();
+
 								int i = clientes.indexOf(cliente);
 								System.out.println("BORRANDO " + clientNames.get(i));
 								clientes.remove(i);
@@ -219,7 +190,6 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 					try
 					{
 						Thread.sleep(10);  // Actualiza cada 10 milisegundos
-						delay += 10;
 					} catch (InterruptedException e)
 					{
 						e.printStackTrace();

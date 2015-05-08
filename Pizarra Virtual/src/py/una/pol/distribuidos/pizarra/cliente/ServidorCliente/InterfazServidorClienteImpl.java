@@ -1,17 +1,18 @@
 
 package py.una.pol.distribuidos.pizarra.cliente.ServidorCliente;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
 import py.una.pol.distribuidos.pizarra.cliente.gui.PanelPizarra;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
 public class InterfazServidorClienteImpl extends UnicastRemoteObject implements InterfazServidorCliente {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1144725160514201643L;
 	private PanelPizarra pizarra;
 	
 	public void actualizar(Punto[] puntos)throws RemoteException{

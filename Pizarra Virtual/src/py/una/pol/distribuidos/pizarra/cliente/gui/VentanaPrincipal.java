@@ -30,6 +30,10 @@ import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
 public class VentanaPrincipal extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3725047045171631988L;
 	private JPanel contentPane;
 	private PanelPizarra panelPizarra;
 	private JPanel panelLateral;
