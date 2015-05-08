@@ -3,12 +3,7 @@ package py.una.pol.distribuidos.pizarra.cliente;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
@@ -19,6 +14,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import py.una.pol.distribuidos.pizarra.cliente.ServidorCliente.ServidorCliente;
+import py.una.pol.distribuidos.pizarra.cliente.gui.PanelPizarra;
 import py.una.pol.distribuidos.pizarra.cliente.gui.VentanaPrincipal;
 import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
 
@@ -35,15 +31,20 @@ public class Main {
 		 */
 		
 		try {
-			ClienteRMI cliente = new ClienteRMI("127.0.1.1", 1099);
-			Dimension dimensiones = cliente.obtenerDimensiones();
+			final ClienteRMI cliente = new ClienteRMI("127.0.1.1", 1099);
 			
-			final int puerto = 44444;
+			/**
+			 * Encontrar puerto libre
+			 */
+			
+			ServerSocket s = new ServerSocket(0);
+			final int puerto = s.getLocalPort();
+			s.close();
 			
 
 
-			String pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
-			Pizarra p = new Pizarra(cliente.getMatriz(), pintor);
+			final String pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
+			final PanelPizarra p = new PanelPizarra(new Pizarra(cliente.getMatriz(), pintor));
 			
 			/**
 			 * Iniciar el servidor para recibir actualizaciones
@@ -62,8 +63,8 @@ public class Main {
 			}
 			*/
 			
-			p.setMatriz(cliente.getMatriz());
-			p.setPintor(pintor);
+			p.getPizarra().setMatriz(cliente.getMatriz());
+			p.getPizarra().setPintor(pintor);
 			
 
 			/*
