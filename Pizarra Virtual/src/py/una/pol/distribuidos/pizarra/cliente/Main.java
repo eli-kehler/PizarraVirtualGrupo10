@@ -32,6 +32,9 @@ public class Main {
 		try {
 			
 			String ip = JOptionPane.showInputDialog(new JFrame(), "Ingrese el IP del servidor");
+			if (ip == null)
+				System.exit(0);
+
 			
 			final ClienteRMI cliente = new ClienteRMI(ip, 1099);
 			
@@ -48,6 +51,8 @@ public class Main {
 			do
 			{
 				t_pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
+				if (t_pintor == null)
+					System.exit(0);
 			} while(!cliente.estaDiponible(t_pintor));
 				
 			final String pintor = t_pintor;
