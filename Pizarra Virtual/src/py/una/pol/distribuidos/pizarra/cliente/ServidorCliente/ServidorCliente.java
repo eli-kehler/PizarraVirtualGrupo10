@@ -1,6 +1,7 @@
 
 package py.una.pol.distribuidos.pizarra.cliente.ServidorCliente;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -45,19 +46,21 @@ public class ServidorCliente {
 					while (direcciones.hasMoreElements() && !registrado) {
 						
 						try {
-							
-							String direccion = ((InetAddress)direcciones.nextElement()).getHostAddress();
-							System.setProperty("java.rmi.server.hostname", direccion );
-							
-							registry = LocateRegistry.createRegistry(puerto);
-							
-							registry.rebind(nombre, new InterfazServidorClienteImpl(pizarra));
-							registrado = cliente.registrarCliente(nombre,direccion , puerto);
-							if (!registrado) 
-								{
-									registry.unbind(nombre);
-									registry = null;
-								}
+							InetAddress inetDir =(InetAddress) direcciones.nextElement();
+							if (inetDir.getClass() == Inet4Address.class){
+								String direccion = inetDir.getHostAddress();
+								System.setProperty("java.rmi.server.hostname", direccion );
+								
+								registry = LocateRegistry.createRegistry(puerto);
+								
+								registry.rebind(nombre, new InterfazServidorClienteImpl(pizarra));
+								registrado = cliente.registrarCliente(nombre,direccion , puerto);
+								if (!registrado) 
+									{
+										registry.unbind(nombre);
+										registry = null;
+									}
+							}
 						} catch (NotBoundException e) {
 							continue;
 						}
