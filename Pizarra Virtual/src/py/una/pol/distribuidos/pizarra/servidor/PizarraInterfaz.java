@@ -11,7 +11,7 @@ public interface PizarraInterfaz extends Remote {
 	public boolean Registrar(String nombre, String direccion, int puerto) throws RemoteException;
 	public Dimension obtenerDimensiones() throws RemoteException;
 	public boolean[][] obtenerMatriz() throws RemoteException;
-	public boolean actualizar(Punto[] puntos) throws RemoteException;
+	public boolean actualizar(Punto[] puntos) throws RemoteException, InterruptedException;
 	
 	public class Punto implements Serializable
 	{
