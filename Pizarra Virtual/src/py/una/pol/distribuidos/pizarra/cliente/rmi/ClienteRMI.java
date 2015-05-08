@@ -42,7 +42,7 @@ public class ClienteRMI {
 		return impl.obtenerMatriz();
 	}
 	
-	public boolean sendToServer(Punto[] puntos) throws RemoteException{
+	public boolean sendToServer(Punto[] puntos) throws RemoteException, InterruptedException{
 
 			return impl.actualizar(puntos);
 	}

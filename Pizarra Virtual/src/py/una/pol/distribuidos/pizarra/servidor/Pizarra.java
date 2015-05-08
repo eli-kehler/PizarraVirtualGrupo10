@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
 
 import py.una.pol.distribuidos.pizarra.cliente.ServidorCliente.InterfazServidorCliente;
 public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
@@ -98,15 +99,19 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 	 * Permite a un Cliente enviar una serie de puntos que fueron modificados
 	 */
 	@Override
-	public synchronized boolean actualizar(Punto[] puntos) throws RemoteException
+	public synchronized boolean actualizar(Punto[] puntos) throws RemoteException, InterruptedException
 	{
 	
 				boolean[][] pizarra_temp = pizarra;
-				for (Punto punto : puntos)
-				{
-					pizarra_temp[punto.posicion.y][punto.posicion.x] = punto.estado;
-					notificador.puntos.add(punto);
-				}
+				
+					notificador.semaforo.acquire();
+					for (Punto punto : puntos)
+					{
+						pizarra_temp[punto.posicion.y][punto.posicion.x] = punto.estado;
+						notificador.puntos.add(punto);
+					}
+					notificador.semaforo.release();
+
 				
 				pizarra = pizarra_temp;
 				return true;
@@ -119,6 +124,7 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 		public ArrayList<InterfazServidorCliente> clientes = null;
 		public ArrayList<String> clientNames = null;
 		public ArrayList<Punto> puntos = null;
+		protected Semaphore semaforo;
 		
 		public Notificador()
 		{
@@ -127,6 +133,7 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 			clientes = new ArrayList<>();
 			clientNames = new ArrayList<>();
 			puntos = new ArrayList<>();
+			semaforo = new Semaphore(1);
 		}
 		
 		@Override
@@ -138,74 +145,82 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 				//boolean refresh = (delay > DELAY);
 				
 	
-				
-				
-				// Si hay cambios que realizar
-				if (!puntos.isEmpty() /*|| refresh*/)
-				{
-					
-					Punto listaPuntos[];
-					
-					//if (!refresh)
-					//{
-						listaPuntos = new Punto[puntos.size()];
-						
-						ArrayList<Punto> puntos_temp = puntos;
-						// Genera la lista de puntos a enviar
-						listaPuntos = puntos_temp.toArray(new Punto[puntos_temp.size()]);
-					//}
-					
-					
-					//TODO
-					/*
-					else
+				try {
+					semaforo.acquire();
+					// Si hay cambios que realizar
+					if (!puntos.isEmpty() /*|| refresh*/)
 					{
-						listaPuntos = new Punto[width * height];
-						boolean[][] pizarra_temp = pizarra;
 						
-						int k = 0;
+						Punto listaPuntos[];
 						
-						for (int y = 0; y < height; y++)
-							for (int x = 0; x < width; x++)
-							{
-								listaPuntos[k++] = new Punto(new Point(x, y), pizarra_temp[y][x]);
-							}
-					}
-					*/
-					
-					
-					// Actualiza los clientes
-					//for (InterfazServidorCliente cliente : clientes)
-					// {
-					for (int z = 0; z < clientes.size(); z++)
-					{
-						InterfazServidorCliente cliente = clientes.get(z);
-						try {
-							cliente.actualizar(listaPuntos);
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							//e.printStackTrace();
-							int i = clientes.indexOf(cliente);
-							System.out.println("BORRANDO " + clientNames.get(i));
-							clientes.remove(i);
-							clientNames.remove(i);
+						//if (!refresh)
+						//{
+							listaPuntos = new Punto[puntos.size()];
 							
+							ArrayList<Punto> puntos_temp = puntos;
+							// Genera la lista de puntos a enviar
+							listaPuntos = puntos_temp.toArray(new Punto[puntos_temp.size()]);
+						//}
+						
+						
+						//TODO
+						/*
+						else
+						{
+							listaPuntos = new Punto[width * height];
+							boolean[][] pizarra_temp = pizarra;
+							
+							int k = 0;
+							
+							for (int y = 0; y < height; y++)
+								for (int x = 0; x < width; x++)
+								{
+									listaPuntos[k++] = new Punto(new Point(x, y), pizarra_temp[y][x]);
+								}
 						}
-					}
-				
-	
-					puntos.clear();
-				}
-				
-				try
-				{
-					Thread.sleep(10);  // Actualiza cada 10 milisegundos
-					delay += 10;
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
+						*/
+						
+						
+						// Actualiza los clientes
+						//for (InterfazServidorCliente cliente : clientes)
+						// {
+						for (int z = 0; z < clientes.size(); z++)
+						{
+							InterfazServidorCliente cliente = clientes.get(z);
+							try {
+								cliente.actualizar(listaPuntos);
+							} catch (RemoteException e) {
+								// TODO Auto-generated catch block
+								//e.printStackTrace();
+								int i = clientes.indexOf(cliente);
+								System.out.println("BORRANDO " + clientNames.get(i));
+								clientes.remove(i);
+								clientNames.remove(i);
+								
+							}
+						}
+					
 		
+						puntos.clear();
+					}
+					semaforo.release();
+					try
+					{
+						Thread.sleep(10);  // Actualiza cada 10 milisegundos
+						delay += 10;
+					} catch (InterruptedException e)
+					{
+						e.printStackTrace();
+						System.exit(1);
+					}
+			
+				
+				} catch (InterruptedException e1) {
+				
+					e1.printStackTrace();
+					System.exit(1);
+				}
+				
 			}
 		}
 		

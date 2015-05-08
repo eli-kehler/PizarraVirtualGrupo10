@@ -159,7 +159,7 @@ public class VentanaPrincipal extends JFrame {
 					try {
 						cliente.sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
 						panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
-					} catch (RemoteException e1) {
+					} catch (RemoteException | InterruptedException e1) {
 						JOptionPane.showMessageDialog(e.getComponent().getParent(), "Error al conectar con servidor\n" + e1.getMessage(),
 								"Error RMI", JOptionPane.ERROR_MESSAGE);
 						e1.printStackTrace();

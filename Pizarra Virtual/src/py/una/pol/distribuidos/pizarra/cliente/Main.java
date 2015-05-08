@@ -31,7 +31,10 @@ public class Main {
 		 */
 		
 		try {
-			final ClienteRMI cliente = new ClienteRMI("127.0.1.1", 1099);
+			
+			String ip = JOptionPane.showInputDialog(new JFrame(), "Ingrese el IP del servidor");
+			
+			final ClienteRMI cliente = new ClienteRMI(ip, 1099);
 			
 			/**
 			 * Encontrar puerto libre
