@@ -15,7 +15,6 @@ public class Pizarra {
 	public Pizarra(boolean[][] matriz, String pintor) {
 		this.matriz = matriz;
 		this.pintor = pintor;
-		System.out.println("Matriz recibida tiene dimensiones " + matriz.length + " x " + matriz[0].length);
 	}
 	
 	public Pizarra(String pintor){

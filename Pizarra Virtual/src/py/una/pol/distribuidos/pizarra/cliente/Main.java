@@ -1,6 +1,5 @@
 package py.una.pol.distribuidos.pizarra.cliente;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -45,8 +44,14 @@ public class Main {
 			s.close();
 			
 
-
-			final String pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
+			String t_pintor;
+			do
+			{
+				t_pintor = JOptionPane.showInputDialog("Ingrese el nombre del pintor.", "");
+			} while(!cliente.estaDiponible(t_pintor));
+				
+			final String pintor = t_pintor;
+			
 			final PanelPizarra p = new PanelPizarra(new Pizarra(cliente.getMatriz(), pintor));
 			
 			/**
