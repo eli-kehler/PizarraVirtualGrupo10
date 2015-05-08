@@ -192,7 +192,7 @@ public class VentanaPrincipal extends JFrame {
 				
 				if (x >= 0 && x < panelPizarra.getWidth() && y >= 0 && y < panelPizarra.getHeight()){
 					
-					
+					/*
 					if (!chckbxBorrar.isSelected()){
 						panelPizarra.pintar(new Rectangle(x,y, 1, 1));
 						puntosActualizar.add(new Punto(e.getPoint(), true));
@@ -202,8 +202,8 @@ public class VentanaPrincipal extends JFrame {
 						puntosActualizar.add(new Punto(e.getPoint(), false));
 						
 					}
+					*/
 					
-					/*
 					if (!chckbxBorrar.isSelected()){
 						panelPizarra.pintar(new Rectangle(x, y, slider.getValue(), slider.getValue()));
 						for (int i = x; i < x+slider.getValue(); i++)
@@ -223,7 +223,7 @@ public class VentanaPrincipal extends JFrame {
 							}
 						
 					}
-					*/
+					
 				
 				}
 			}

@@ -9,6 +9,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -104,7 +105,7 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 				for (Punto punto : puntos)
 				{
 					pizarra_temp[punto.posicion.y][punto.posicion.x] = punto.estado;
-					notificador.puntos.put(punto.posicion, punto.estado);
+					notificador.puntos.add(punto);
 				}
 				
 				pizarra = pizarra_temp;
@@ -117,7 +118,7 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 		// Lista de Objetos a Clientes remotos (en caso de utilizarlos para notificarlos de eventos)
 		public ArrayList<InterfazServidorCliente> clientes = null;
 		public ArrayList<String> clientNames = null;
-		public TreeMap<Point, Boolean> puntos = null;
+		public ArrayList<Punto> puntos = null;
 		
 		public Notificador()
 		{
@@ -125,25 +126,7 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 			
 			clientes = new ArrayList<>();
 			clientNames = new ArrayList<>();
-			puntos = new TreeMap<>(new Comparator<Point>(){
-               
-				@Override
-                public int compare(Point o1, Point o2) {
-					if (o1.x < o2.x) return -1;
-					else if (o1.x == o2.x)
-					{
-						if (o1.y < o2.y) return -1;
-						else if (o1.y == o2.y) return 0;
-						return 1;
-					}
-					return 1;
-				}
-				
-				/*public boolean equals(Point o1, Point o2)
-				{
-					return o1.x == o2.x && o1.y == o2.y;
-				}*/
-            });
+			puntos = new ArrayList<>();
 		}
 		
 		@Override
@@ -166,13 +149,10 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 					//if (!refresh)
 					//{
 						listaPuntos = new Punto[puntos.size()];
-						int k = 0;
 						
+						ArrayList<Punto> puntos_temp = puntos;
 						// Genera la lista de puntos a enviar
-						for (Map.Entry<Point, Boolean> entry : puntos.entrySet())
-						{
-							listaPuntos[k++] = new Punto(entry.getKey(), entry.getValue());				
-						}
+						listaPuntos = puntos_temp.toArray(new Punto[puntos_temp.size()]);
 					//}
 					
 					
