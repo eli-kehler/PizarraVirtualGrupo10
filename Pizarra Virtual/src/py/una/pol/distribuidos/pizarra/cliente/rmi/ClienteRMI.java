@@ -1,14 +1,12 @@
 package py.una.pol.distribuidos.pizarra.cliente.rmi;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.rmi.*;
+import java.awt.Dimension;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.awt.Dimension;
-import java.awt.Point;
 
-import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz;
 import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
@@ -16,6 +14,7 @@ import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
 public class ClienteRMI {
 	private PizarraInterfaz impl;
+	
 	
 	public ClienteRMI(String host, int port) throws AccessException, RemoteException, NotBoundException{
 		
@@ -31,6 +30,11 @@ public class ClienteRMI {
 		
 	}
 	
+	public boolean estaDiponible(String nombre) throws RemoteException
+	{
+		return impl.EstaDisponible(nombre);
+	}
+	
 	public boolean registrarCliente(String nombre, String address, int port) throws RemoteException, NotBoundException{
 
 		return impl.Registrar(nombre, address, port);
@@ -42,8 +46,8 @@ public class ClienteRMI {
 		return impl.obtenerMatriz();
 	}
 	
-	public boolean sendToServer(Punto[] puntos) throws RemoteException, InterruptedException{
+	public boolean sendToServer(Punto[] puntos, String pintor) throws RemoteException, InterruptedException{
 
-			return impl.actualizar(puntos);
+			return impl.actualizar(puntos, pintor);
 	}
 }

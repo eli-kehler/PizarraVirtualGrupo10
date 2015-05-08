@@ -8,10 +8,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
 
 import py.una.pol.distribuidos.pizarra.cliente.ServidorCliente.InterfazServidorCliente;
@@ -50,10 +46,20 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 		new Thread(notificador).start();
 	}
 	
+	@Override
+	public boolean EstaDisponible(String nombre) throws RemoteException
+	{
+		return !notificador.clientNames.contains(nombre);
+	}
+	
+	
+	
 	/* Permite a un cliente registrarse, dandole informacion
 	 * al Servidor del nombre de su objeto remoto, direccion y puerto
 	 *  Retorna verdadero si el servidor pudo establecer la conexion, falso
 	 * en caso contrario */
+	
+	
 	@Override
 	public boolean Registrar(String nombre, String direccion, int puerto)
 			throws RemoteException
@@ -99,9 +105,11 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 	 * Permite a un Cliente enviar una serie de puntos que fueron modificados
 	 */
 	@Override
-	public synchronized boolean actualizar(Punto[] puntos) throws RemoteException, InterruptedException
+	public synchronized boolean actualizar(Punto[] puntos, String name) throws RemoteException, InterruptedException
 	{
-	
+		
+			if (!notificador.clientNames.contains(name)) return false;
+		
 				boolean[][] pizarra_temp = pizarra;
 				
 					notificador.semaforo.acquire();
@@ -142,13 +150,16 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 			
 			while (true)
 			{
-				//boolean refresh = (delay > DELAY);
+			//	boolean refresh = (delay > DELAY);
 				
 	
 				try {
 					semaforo.acquire();
+					
+					if (puntos.isEmpty()) puntos.add(new Punto(new Point(0,0), pizarra[0][0]));
+					
 					// Si hay cambios que realizar
-					if (!puntos.isEmpty() /*|| refresh*/)
+					if (!puntos.isEmpty()/* || refresh*/)
 					{
 						
 						Punto listaPuntos[];
@@ -177,8 +188,9 @@ public class Pizarra extends UnicastRemoteObject implements PizarraInterfaz
 								{
 									listaPuntos[k++] = new Punto(new Point(x, y), pizarra_temp[y][x]);
 								}
-						}
-						*/
+							delay = 0;
+						}*/
+						
 						
 						
 						// Actualiza los clientes

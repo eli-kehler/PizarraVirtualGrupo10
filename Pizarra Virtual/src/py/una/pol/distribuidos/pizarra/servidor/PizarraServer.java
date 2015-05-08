@@ -11,6 +11,9 @@ public class PizarraServer {
 	public PizarraServer(){}
 	
 	public void iniciarServidor(){
+		/* Aca va la ip del servidor */
+		System.setProperty("java.rmi.server.hostname", "192.168.0.14");
+		
 		try {
 			Registry registry = LocateRegistry.createRegistry(1099);
 			registry.rebind("miPizarra", new Pizarra());

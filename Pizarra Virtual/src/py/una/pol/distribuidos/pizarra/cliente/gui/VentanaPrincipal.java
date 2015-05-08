@@ -1,46 +1,32 @@
 package py.una.pol.distribuidos.pizarra.cliente.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.HashSet;
-
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EmptyBorder;
-
-import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
-import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
-import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
-
-import javax.swing.JSlider;
-import javax.swing.JLabel;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.JTextField;
-
-import java.awt.FlowLayout;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JFormattedTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import py.una.pol.distribuidos.pizarra.cliente.rmi.ClienteRMI;
+import py.una.pol.distribuidos.pizarra.servidor.PizarraInterfaz.Punto;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -157,7 +143,7 @@ public class VentanaPrincipal extends JFrame {
 				if (puntosActualizar.size() > 0){
 					
 					try {
-						cliente.sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+						cliente.sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]), panelPizarra.getPizarra().getPintor());
 						panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
 					} catch (RemoteException | InterruptedException e1) {
 						JOptionPane.showMessageDialog(e.getComponent().getParent(), "Error al conectar con servidor\n" + e1.getMessage(),
@@ -224,6 +210,22 @@ public class VentanaPrincipal extends JFrame {
 						
 					}
 					
+					if (puntosActualizar.size() > 10) 
+					{ 
+						
+						try {
+							cliente.sendToServer(puntosActualizar.toArray(new Punto[puntosActualizar.size()]), panelPizarra.getPizarra().getPintor());
+							panelPizarra.getPizarra().actualizarMatriz(puntosActualizar.toArray(new Punto[puntosActualizar.size()]));
+						} catch (RemoteException | InterruptedException e1) {
+							JOptionPane.showMessageDialog(e.getComponent().getParent(), "Error al conectar con servidor\n" + e1.getMessage(),
+									"Error RMI", JOptionPane.ERROR_MESSAGE);
+							e1.printStackTrace();
+
+						}
+						panelPizarra.repaint();
+						puntosActualizar.clear();
+						
+					}
 				
 				}
 			}
