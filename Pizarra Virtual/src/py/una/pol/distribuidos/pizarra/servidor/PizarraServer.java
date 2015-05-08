@@ -12,7 +12,7 @@ public class PizarraServer {
 	
 	public void iniciarServidor(){
 		/* Aca va la ip del servidor */
-		System.setProperty("java.rmi.server.hostname", "192.168.0.14");
+		System.setProperty("java.rmi.server.hostname", "10.15.15.1");
 		
 		try {
 			Registry registry = LocateRegistry.createRegistry(1099);

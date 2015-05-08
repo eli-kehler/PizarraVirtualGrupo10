@@ -10,7 +10,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Enumeration;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -38,7 +37,7 @@ public class ServidorCliente {
 			try {
 
 				
-				/*Enumeration<?> interfaces = NetworkInterface.getNetworkInterfaces();
+				Enumeration<?> interfaces = NetworkInterface.getNetworkInterfaces();
 				boolean registrado = false;
 				while (interfaces.hasMoreElements() && !registrado){
 					NetworkInterface interfaz = (NetworkInterface) interfaces.nextElement();
@@ -49,32 +48,42 @@ public class ServidorCliente {
 							
 							String direccion = ((InetAddress)direcciones.nextElement()).getHostAddress();
 							System.setProperty("java.rmi.server.hostname", direccion );
+							
 							registry = LocateRegistry.createRegistry(puerto);
 							
 							registry.rebind(nombre, new InterfazServidorClienteImpl(pizarra));
-							cliente.registrarCliente(nombre,direccion , puerto);
+							registrado = cliente.registrarCliente(nombre,direccion , puerto);
+							if (!registrado) 
+								{
+									registry.unbind(nombre);
+									registry = null;
+								}
 						} catch (NotBoundException e) {
 							continue;
 						}
 					}
 				}
-				*/
 				
-				/* Aca va la ip del cliente */
+				/*
+				/* Aca va la ip del cliente 
 				String direccion = "127.0.0.1";
 				System.setProperty("java.rmi.server.hostname", direccion );
 				registry = LocateRegistry.createRegistry(puerto);
 				
 				registry.rebind(nombre, new InterfazServidorClienteImpl(pizarra));
 				cliente.registrarCliente(nombre,direccion , puerto);
-
+*/
 			} catch (RemoteException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(new JFrame(), "Error de RMI.\n" + e.getMessage());
 				System.exit(1);
-			} catch (NotBoundException e) {
+			} /*catch (NotBoundException e) {
 				e.printStackTrace();
 				
+			}*/ catch (SocketException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 			
 			
