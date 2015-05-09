@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.util.concurrent.Semaphore;
+
 import javax.swing.JPanel;
 
 import py.una.pol.distribuidos.pizarra.cliente.Pizarra;
@@ -21,6 +23,7 @@ public class PanelPizarra extends JPanel {
 	
 	private Pizarra pizarra;
 	private ClienteRMI cliente;
+	private Semaphore semaphore = new Semaphore(1);
 	
 	
 	/**
@@ -30,8 +33,21 @@ public class PanelPizarra extends JPanel {
 		pizarra = p;
 		this.setSize(pizarra.getDimension());
 		
-		
 	}
+	
+	public void repaint(){
+		if (semaphore != null)
+			try {
+				semaphore.acquire();
+				super.repaint();
+				semaphore.release();
+			} catch (InterruptedException e){
+				e.printStackTrace();
+			}
+		else
+			super.repaint();
+	}
+	
 	/**
 	 * Metodo llamado cada vez que se pinta el panel
 	 */
